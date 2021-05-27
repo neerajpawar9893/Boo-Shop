@@ -7,6 +7,7 @@
     <h1>Add Product</h1>
   </div>
   <form action="/addProduct" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="<%= csrfToken%>">
   <div class="login-form">
     <h3>Product Title</h3>
     <input type="text" placeholder="Product Title" name="productTitle"/><br>
