@@ -9,6 +9,7 @@ var MongoDBStore = require('connect-mongodb-session')(session);
 var multer  = require('multer');
 var flash = require('connect-flash');
 const csrf = require('csurf');
+const errorCountrol = require('./controller/error');
 
 const User = require('./model/authModel');
 
@@ -87,29 +88,29 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   res.locals.isAuth = req.session.isLoggedIn;
   res.locals.csrfToken = req.csrfToken();
-  console.log(res.locals.csrfToken,'app.js 51')
   next();
 });
 
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use(errorCountrol.get404);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+// app.use(function(req, res, next) {
+//   next(createError(404));
+// });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+// // error handler
+// app.use(function(err, req, res, next) {
+//   // set locals, only providing error in development
+//   res.locals.message = err.message;
+//   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+//   // render the error page
+//   res.status(err.status || 500);
+//   res.render('error');
+// });
 
 mongoose.connect('mongodb+srv://neeraj:niru143@cluster0.cf2jj.mongodb.net/newDb?retryWrites=true&w=majority')
 .then(result=> {
