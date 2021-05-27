@@ -18,6 +18,7 @@
             <h4>Total: <%= totalSum%></h4>
         </div>
         <form action="/creat-order" method="POST" style="text-align: center;">
+            <input type="hidden" name="_csrf" value="<%= csrfToken%>">
             <input type="hidden" name="productId" value="<%= products._id %>">
             <button  class="btn btn-outline-info" type="Submit">Order</button>
         </form>
