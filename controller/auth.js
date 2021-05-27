@@ -6,7 +6,7 @@ const Auth = require('../model/authModel');
 
 var mailer =  nodemailer.createTransport(sgTransport({
     auth: {
-        api_key: 'Your Sendgrid_Api'
+        api_key: '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'
     }
 }));
 

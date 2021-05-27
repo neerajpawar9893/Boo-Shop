@@ -1,4 +1,6 @@
 const Product = require('../model/productModel');
+const fs = require('fs');
+const path = require('path');
 
 exports.getAddProduct = (req, res, next ) => {
     res. render('admin/addProduct',{title: 'Add Product', isAuth: req.session.isLoggedIn , path: '/addProduct'})
@@ -17,8 +19,6 @@ exports.getProduct = (req, res, next) => {
     })
     .catch(err => console.log(err));
 }
-
-
 
 exports.postAddProduct = (req, res, next) => {
     const productTitle = req.body.productTitle;
@@ -65,7 +65,7 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    console.log(prodId,'66');
+    // console.log(prodId,'66');
     const updateTitle = req.body.productTitle;
     const updatePrice = req.body.price;
     const updateDesc = req.body.productDesc
@@ -81,7 +81,7 @@ exports.postEditProduct = (req, res, next) => {
             product.image = updateImage.path;
         }
         return product.save();
-    })
+    })  
     .then(result => {
         console.log('Product Update Success');
         res.redirect('/admin/product');
@@ -91,11 +91,19 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    // console.log(prodId,'50')
-    Product.deleteOne({_id : prodId, userId: req.user._id})
-    .then(result=> {
+    Product.findById({_id : prodId, userId: req.user._id})
+    .then(deleteImage => {
+        clearImage(deleteImage.image)
+        return Product.findByIdAndRemove(prodId);
+    })
+    .then(result=> {        
         console.log('Product Delete Success');
         res.redirect('/admin/product');
     })
     .catch(err => console.log(err));
 };
+
+const clearImage = filePath => {
+    filePath = path.join(__dirname, '..', filePath);
+    fs.unlink(filePath, err => console.log(err));
+}
