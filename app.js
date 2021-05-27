@@ -8,7 +8,7 @@ var session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 var multer  = require('multer');
 var flash = require('connect-flash');
-// const csrf = require('csurf');
+const csrf = require('csurf');
 
 const User = require('./model/authModel');
 
@@ -17,43 +17,12 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 var store = new MongoDBStore({
-  uri: 'Your Mongodb_Url',
+  uri: 'mongodb+srv://neeraj:niru143@cluster0.cf2jj.mongodb.net/newDb?retryWrites=true&w=majority',
   collection: 'mySessions'
 });
 
-// const csrfProtection = csrf();
+const csrfProtection = csrf();
 
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: false,
-  store: store
-  // cookie: {
-  //   expires: 600000
-  // }
-}));
-app.use(flash());
-// app.use(csrfProtection);
-
-app.use((req, res, next) => {
-  if(!req.session.user) {
-    return next();
-  }
-  User.findById(req.session.user._id)
-  .then(user => {
-    req.user = user;
-    // console.log(req.user,'app js 43')
-    next();
-  })
-  .catch(err => console.log(err));
-});
-
-// app.use((req, res, next) => {
-//   req.local.isAuth = req.session.isLoggedIn;
-//   req.local.csrfToken = req.csrfToken();
-//   console.log(req.local.csrfToken,'app.js 51')
-//   next();
-// });
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -90,6 +59,39 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(multer({ storage: storage , fileFilter: fileFilter, dest: './images'}).single('image'));
 
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+  store: store
+  // cookie: {
+  //   expires: 600000
+  // }
+}));
+app.use(flash());
+app.use(csrfProtection);
+
+app.use((req, res, next) => {
+  if(!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
+  .then(user => {
+    req.user = user;
+    // console.log(req.user,'app js 43')
+    next();
+  })
+  .catch(err => console.log(err));
+});
+
+app.use((req, res, next) => {
+  res.locals.isAuth = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  console.log(res.locals.csrfToken,'app.js 51')
+  next();
+});
+
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
@@ -109,7 +111,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-mongoose.connect('Your Mongodb_Url')
+mongoose.connect('mongodb+srv://neeraj:niru143@cluster0.cf2jj.mongodb.net/newDb?retryWrites=true&w=majority')
 .then(result=> {
   app.listen(3000);
   console.log('Database connected');
